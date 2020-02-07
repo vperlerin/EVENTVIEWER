@@ -205,7 +205,22 @@
 
          trace1.x = data.x1_vals;
          trace1.y = data.y1_vals; 
+
+         // Add labels
+         if(typeof data.x_label !== "undefined") {
+            layout.xaxis.title.text = data.x_label;
+            layout.xaxis.title.font.color = AXIS_FONT_COLOR ;
+         }
+
+         if(typeof data.y_label !== "undefined") {
+            layout.yaxis.title.text = data.y_label;
+            layout.yaxis.title.font.color = AXIS_FONT_COLOR ;
+         }
+
+
          trace1.name = "Meteor Position";
+
+         // Add label
 
          layout.title.text =  data.plot_name;  
 

@@ -9,7 +9,7 @@
          "y_label": "Oh Yeah!"
        },
       {
-         "plot_name": "XY Points Trendline",
+         "plot_name": "XY Points Trendline - Station AMS9, Cam. 010045",
          "plot_type": "xy",
          "y1_vals": [417,419,419,440,447,456,464,471,477,485,493,496,502,515,521,527],
          "x2_vals": [347,345,345,338,336,333,331,330,327,325,323,322,321,316,315,312],

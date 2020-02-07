@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+      <title>AllSkycams Event Plots Viewer</title>  
+   </head>
+   <body>
+   <script src="./dist/js/allsky_eventviewer.min.js"></script>
+   <script>
+
+      /************ GRAPHICS STYLES ********************/
+      var PLOT_W = 937;
+      var PLOT_H = 517;
+      var GRID_COLOR = 'rgba(255,255,255,.1)';
+      var TICK_FONT_COLOR = 'rgba(255,255,255,.75)';
+      var H_LINE_COLOR = 'rgba(255,255,255,.4)';
+      var V_LINE_COLOR = 'rgba(255,255,255,.1)';
+      var FONT_COLOR = '#ffffff';
+      var AXIS_FONT_COLOR = '#b1b1b1';
+      var LEGEND_FONT_COLOR = FONT_COLOR;
+      var PAPER_BG_COLOR = 'rgba(9,29,63,1)';
+      var PLOT_BG_COLOR = PAPER_BG_COLOR;
+      var TRENDLINE_COLOR = 'rgba(213,42,224,.5)';
+ 
+      /*******************************/
+      var graph_counter = 0;
+ 
+      /*********** PARSE URL ***************************/
+
+      // URL PARAM:
+      // j= json with plots
+      // t= which plots we want to display
+
+      // Print error
+      function print_error(txt) {
+         $('<div class="alert alert-danger">'+txt+'</div>').appendTo($('body'));
+      }
+      
+      // Read URL PARAMS
+      function urlParams() {
+         location.queryString = {};
+         location.search.substr(1).split("&").forEach(function (pair) {
+            if (pair === "") return;
+            var parts = pair.split("=");
+            location.queryString[parts[0]] = parts[1] && decodeURIComponent(parts[1].replace(/\+/g, " "));
+         });
+         return location.queryString;
+      } 
+      
+      // Get URL PARAMS AND PARSE JSON
+      function get_json() {
+         var all_params = urlParams(); 
+         if(typeof all_params['j'] !== 'undefined' && typeof all_params['t'] !== 'undefined') {
+            parseJsonPlot(all_params['j'],all_params['t']);
+         } else {
+            // WE DRAW ALL PLOTS????
+            // FOR NOW... NO
+            print_error('t parameter (plot type) is missing in URL')
+         }
+      }
+
+      // PARSE JSON
+      function parseJsonPlot(json_file,plot_type) {
+
+         // Plot type can be either a list of plot types
+         // ex: t=xy%2Ctest
+         // or a single value
+         // ex: t=xy
+         var r_plot_type = plot_type.split(",")
+         
+         $.ajax({
+            url :json_file, 
+            dataType : 'json',
+            success : function(json_code, status){ // success est toujours en place, bien sûr !
+               var f = false;
+               if(typeof json_code['plots'] !== "undefined") {
+
+                  // We search the proper plots
+                  $.each(json_code['plots'], function(i,v) { 
+                     if(r_plot_type.indexOf(v['plot_type']) > -1)  {
+                        // We Draw the corresponding plot
+                        draw_plot(v,r_plot_type[r_plot_type.indexOf(v['plot_type'])]);
+                        f= true;
+                        r_plot_type.splice(r_plot_type.indexOf(v['plot_type']), 1);
+                        console.log(r_plot_type);
+                     }
+                  })
+
+                  if(!f) {
+                     print_error('Plot type <b>' + plot_type + '</b> not found')
+                  }
+
+               } else {
+                  print_error('Plots not found in ' + json_file)
+               }
+            },
+
+            error : function(res, status, error){
+               print_error('Impossible to parse the file ' + json_file + "<br>" + error)
+            }
+
+         });
+ 
+      }
+
+
+      /*********** DRAW PLOT ***************************/
+      // HEx to RGBA 
+      function hexToRgb(hex) {
+         var bigint = parseInt(hex, 16);
+         var r = (bigint >> 16) & 255;
+         var g = (bigint >> 8) & 255;
+         var b = bigint & 255;
+         return r + "," + g + "," + b + ",1";
+      } 
+ 
+      function create_rainbow_colors() {
+         // Create Colors
+         var rainbow = new Rainbow();
+         rainbow.setNumberRange(0, 255);
+         return rainbow;
+      }
+      
+
+      // Add rainbdow colors to array
+      function  get_rainbow_colors(total,rainbowcolors) {
+         var all_colors = [];
+         if(total>=255) {   
+            // Default color for the end...
+            for (var i = 255; i <= total; i = i + step) {
+               all_colors[i] = '#0000ff';
+            }
+            for (var i = 0; i <= 255; i = i + step) {
+               all_colors[i] = '#'+rainbowcolors.colourAt(i);
+            }
+         } else {
+            step = parseInt(255/total);  
+
+            for (var i = 0; i <= 255; i = i + step) {
+               all_colors.push('rgba('+hexToRgb(rainbowcolors.colourAt(i))+')');
+            }
+         }
+         return all_colors;
+      }
+
+      function draw_plot_xy(data) {
+
+         // Markers
+         var trace1 =  {
+               type: 'scatter',
+               marker : { symbol: 'square-open-dot', size:10 },
+               xaxis: "x1",
+               yaxis: "y1",
+               mode: 'markers'
+         };
+         
+         var layout = {
+            title: { 
+               font: {  color: FONT_COLOR },
+               xref: 'x',   
+               yref: 'y',  
+               x: 0.05, 
+            },
+            height: PLOT_H,
+            width: PLOT_W,
+            paper_bgcolor: PAPER_BG_COLOR,   
+            plot_bgcolor: PLOT_BG_COLOR,    
+            xaxis:{ 
+                  zerolinecolor: H_LINE_COLOR, 
+                  zerolinewidth: 1,
+                  gridcolor: GRID_COLOR, 
+                  linecolor: H_LINE_COLOR,  
+                  title: { font: { size: 15, color: AXIS_FONT_COLOR } },
+                  tickfont: { color: TICK_FONT_COLOR},
+                  side:'top'
+            },
+            yaxis:{
+                  zerolinecolor: V_LINE_COLOR, 
+                  zerolinewidth: 1, 
+                  gridcolor: GRID_COLOR, 
+                  linecolor: V_LINE_COLOR,
+                  title: { font: {  size: 15, color:  AXIS_FONT_COLOR}}, 
+                  tickfont: { color: TICK_FONT_COLOR},
+                  scaleanchor: "x",
+                  scaleratio: 1,
+                  autorange: "reversed" 
+            },
+            showlegend: true,
+            legend: {
+               traceorder: 'normal',
+               font: {
+               color: LEGEND_FONT_COLOR
+               } 
+            }
+         }; 
+
+         var graph_name = 'graph'+graph_counter;
+         graph_counter+=1;
+
+         trace1.x = data.x1_vals;
+         trace1.y = data.y1_vals; 
+         trace1.name = "Meteor Position";
+
+         layout.title.text =  data.plot_name;  
+
+         // Add rainbow colors
+         var all_colors = get_rainbow_colors(data.x1_vals.length, create_rainbow_colors());  
+         var step = 1;
+       
+
+         // We add the color scale  or X
+         trace1.marker.color  =  all_colors;  
+
+
+         // Add the div
+         $('<div id="'+graph_name+'"></div>').appendTo($('body'));
+
+         Plotly.newPlot(graph_name, [trace1], layout, {responsive: true});
+         
+         if(typeof data.x2_vals !== 'undefined') {
+            // TRENDLINE
+            var trace2 = {
+               mode: 'lines',
+               type: 'scatter', 
+               yaxis: "x2",
+               line: {
+                  color: TRENDLINE_COLOR 
+               }
+            }; 
+            trace2.x = data.x2_vals;
+            trace2.y = data.y2_vals;
+            trace2.name='Trending Line';
+            
+            // We add the 2nd "trace"
+            Plotly.addTraces(graph_name,trace2);
+         } 
+      }
+      
+      
+      // Main function to draw all plots
+      function draw_plot(data,plot_type) {
+         if(plot_type=='light_int') {
+         } else {
+            // Default x,y with trendline
+            draw_plot_xy(data);
+         }
+      }
+
+
+      $(function() {
+         get_json();
+      });
+ 
+
+   </script>
+   </body>
+</html>

@@ -21,7 +21,8 @@
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.1",
     "jquery": "^3.3.1",
-    "popper.js": "^1.15.0"
+    "popper.js": "^1.15.0",
+    "lodash": ">=4.17.12"
   },
   "author": "Mike Hankey, Vincent Perlerin",
   "license": "ISC"

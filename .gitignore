@@ -1,0 +1,5 @@
+/node_modules 
+*.txt    
+*.swp
+!./dist/**/*.png
+!./src/* 

@@ -5,8 +5,9 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
       <title>AllSkycams Event Plots Viewer</title>  
+      <style>.svg-container{margin:0 auto!important;}</style>
    </head>
-   <body>
+   <body style="margin:0; padding:0;">
    <script src="./dist/js/allsky_eventviewer.min.js"></script>
    <script>
 
@@ -87,6 +88,10 @@
                         console.log(r_plot_type);
                      }
                   })
+
+
+                  // Change Body bg color
+                  $('body').css('background-color',PAPER_BG_COLOR);
 
                   if(!f) {
                      print_error('Plot type <b>' + plot_type + '</b> not found')

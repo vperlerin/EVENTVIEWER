@@ -38,7 +38,8 @@
       var SUB_UNIT_BORDER = "#ccc";
 
       // ALL MARKERS (ONE FOR EACH STATION)
-      var ALL_MARKERS = ["cross","diamond","circle","square","triangle-up","pentagon","hexagon","octagon","star","hexagram"];
+      // see https://plot.ly/javascript/reference/#scatter-marker
+      var ALL_MARKERS = ["cross-open","diamond-open","triangle-up-open","circle-open","square-open","pentagon-open","hexagon-open","octagon-open","star-open","hexagram-open"];
       var MARKER_CNT = 0; 
 
       var XY_SERIES_MAX = 3;
@@ -342,7 +343,7 @@
                   y: data[field_y],
                   mode: 'markers',
                   marker: {  symbol: (data[data_marker]?data[data_marker]:get_marker()), 
-                             size: (data[data_marker_size]?data[data_marker_size]:10), 
+                             size: (data[data_marker_size]?data[data_marker_size]:6), 
                              type: 'scatter'
                   },
                   name: (data[data_label]?data[data_label]:'') 

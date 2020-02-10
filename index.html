@@ -5,7 +5,7 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
       <title>AllSkycams Event Plots Viewer</title>  
-      <style>*,body{color:#fff;text-align: center}.svg-container{margin:0 auto!important;}</style>
+      <style>*,body{color:#000;text-align: center}.svg-container{margin:0 auto!important;}</style>
    </head>
    <body style="margin:0; padding:0;">
    <script src="./dist/js/allsky_eventviewer.min.js"></script>
@@ -27,6 +27,20 @@
  
       /*******************************/
       var graph_counter = 0;
+
+
+      /*********** UI ***************************/
+
+
+      // Hide legend on hover (if data is behind)
+      function hide_legend_on_hover() {
+         $('.main-svg').hover(function() {
+            $('.legend').fadeOut();
+         }).mouseout(function() {
+            $('.legend').fadeIn();
+         });
+      }
+
  
       /*********** PARSE URL ***************************/
 
@@ -74,20 +88,20 @@
          $.ajax({
             url :json_file, 
             dataType : 'json',
-            success : function(json_code, status){ // success est toujours en place, bien sûr !
+            success : function(json_code, status){ 
                var f = false;
+
                if(typeof json_code['plots'] !== "undefined") {
 
                   // We search the proper plots
                   $.each(json_code['plots'], function(i,v) { 
-                     if(r_plot_type.indexOf(v['plot_type']) > -1)  {
+                     if(r_plot_type.indexOf(v['plot_id']) > -1)  {
                         // We Draw the corresponding plot
-                        draw_plot(v,r_plot_type[r_plot_type.indexOf(v['plot_type'])]);
+                        draw_plot(v,r_plot_type[r_plot_type.indexOf(v['plot_id'])]);
                         f= true;
-                        r_plot_type.splice(r_plot_type.indexOf(v['plot_type']), 1); 
+                        r_plot_type.splice(r_plot_type.indexOf(v['plot_id']), 1); 
                      }
                   })
-
 
                   // Change Body bg color
                   $('body').css('background-color',PAPER_BG_COLOR);
@@ -149,6 +163,9 @@
          return all_colors;
       }
 
+
+
+      // Default Drawing function
       function draw_plot_xy(data) {
 
          // Markers
@@ -193,9 +210,15 @@
             },
             showlegend: true,
             legend: {
+               x: 1,
+               xanchor: 'right',
+               y: 0,
                traceorder: 'normal',
+               bordercolor: 'rgba(255,255,255,.3)',
+               borderwidth: 1,
+               bgcolor: 'rgba(255,255,255,.1)',
                font: {
-               color: LEGEND_FONT_COLOR
+                  color: LEGEND_FONT_COLOR
                } 
             }
          }; 
@@ -265,6 +288,9 @@
             // Default x,y with trendline
             draw_plot_xy(data);
          }
+
+         // Setup UI
+         hide_legend_on_hover();
       }
 
 

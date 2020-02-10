@@ -28,7 +28,6 @@
       var DEFAULT_LINE_COLOR = 'rgba(213,42,224,.5)';
 
       // LEGEND
-         
       var LEGEND_FONT_COLOR = FONT_COLOR;
       var LEGEND_BORDER = 'rgba(255,255,255,.0)';
       var LEGEND_BG = 'rgba(255,255,255,.01)';
@@ -37,7 +36,10 @@
       var RIVER_COLOR = "#c8eaff";
       var LAND_COLOR = "#d4ffae";
       var SUB_UNIT_BORDER = "#ccc";
- 
+
+      // ALL MARKERS (ONE FOR EACH STATION)
+      var ALL_MARKERS = ["cross","diamond","circle","square","triangle-up","pentagon","hexagon","octagon","star","hexagram"];
+      var MARKER_CNT = 0; 
 
       var XY_SERIES_MAX = 3;
  
@@ -120,6 +122,8 @@
                      if(r_plot_id.indexOf(v['plot_id']) > -1)  {
                         // We Draw the corresponding plot 
                         draw_plot(v,r_plot_id.indexOf(v['plot_id']));
+                        // We reset the marker counter
+                        MARKER_CNT = 0;
                         f= true;
                      }
                   })
@@ -282,6 +286,12 @@
       }
 
 
+      function get_marker() {
+         MARKER_CNT++;
+         if(MARKER_CNT>ALL_MARKERS.length) MARKER_CNT = 0;
+         return ALL_MARKERS[MARKER_CNT]; 
+      }
+
       // Draw default x,y plot
       function draw_plot_xy(data) {
 
@@ -314,7 +324,7 @@
          traces = [];
          ti = 0;  // Trace Counter
 
-         for (i = 1; i <= XY_SERIES_MAX; i++) {
+         for (var i = 1; i <= XY_SERIES_MAX; i++) {
             
             // The values
             field_x           = "x" + i + "_vals";
@@ -331,8 +341,8 @@
                   x: data[field_x],
                   y: data[field_y],
                   mode: 'markers',
-                  marker: {  symbol: (data[data_marker]?data[data_marker]:'cross'), 
-                             size: (data[data_marker_size]?data[data_marker_size]:5), 
+                  marker: {  symbol: (data[data_marker]?data[data_marker]:get_marker()), 
+                             size: (data[data_marker_size]?data[data_marker_size]:10), 
                              type: 'scatter'
                   },
                   name: (data[data_label]?data[data_label]:'') 

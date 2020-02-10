@@ -37,7 +37,7 @@
            ]
        },
        {
-         "plot_id": "ground_track_2",
+         "plot_id": "ground_track",
          "plot_name": "Ground Track No Scope", 
          "plot_type": "map",
          "x_label": "Latitude",

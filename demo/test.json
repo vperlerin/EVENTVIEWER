@@ -777,7 +777,7 @@
                36121.17149212275,
                35839.230584629324
            ],
-           "x2_data_label": "AMS9-010050, RMSD = 107.22 m"
+           "x2_data_label": "AMS9-010050, RMSD = 107.22 m" 
        },
        {
            "plot_id": "lags_all_stations",

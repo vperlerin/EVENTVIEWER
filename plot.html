@@ -234,14 +234,11 @@
             resolution: 50,
             showland: true,
             showlakes: false,
-            showrivers: false, 
-            showseas:true,
-            showcountries: true,
-            showstates:true,
-            showcoastlines: false, 
+            showrivers: false,  
+            showcountries: true,  
             landcolor: LAND_COLOR,  
             countrywidth: 1.5, 
-            coastlinewidth: 1,
+            coastlinewidth: .5,
             width: PLOT_W,
             height: PLOT_H,
             lataxis: {
@@ -328,7 +325,12 @@
 
                // Colors
                if(data[data_marker_color]) {
-                  traces[ti].color = data[data_marker_color]; 
+                  traces[ti].marker.color = data[data_marker_color]; 
+               }
+
+               // Markers size
+               if(data[data_marker_size]) {
+                  traces[ti].marker.size = data[data_marker_size]; 
                }
 
                // Line
@@ -394,8 +396,7 @@
             text:  [data['point_names'][i]],
             textposition: ["top center"],
             name: data['point_names'][i]
-         }
-
+         } 
          lats.push(tlat) 
          lons.push(tlon)  
          traces.push(trace) 

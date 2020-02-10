@@ -47,7 +47,7 @@
       /*********** UI ***************************/
       // Hide legend on hover (if data is behind)
       function hide_legend_on_hover() {
-         $('.js-plotly-plot').hover(function() {
+         $('.svg-container').hover(function() {
             $(this).find('.legend').fadeOut();
          }).mouseout(function() {
             $(this).find('.legend').fadeIn();
@@ -234,17 +234,13 @@
             resolution: 50,
             showland: true,
             showlakes: false,
-            showrivers: true, 
+            showrivers: false, 
             showseas:true,
             showcountries: true,
             showstates:true,
-            showcoastlines: false,
-            rivercolor: RIVER_COLOR,  
-            landcolor: LAND_COLOR, 
-            lakecolor: RIVER_COLOR,
-            countrycolor: '#d3d3d3',
-            countrywidth: 1.5,
-            subunitcolor: '#d3d3d3', 
+            showcoastlines: false, 
+            landcolor: LAND_COLOR,  
+            countrywidth: 1.5, 
             coastlinewidth: 1,
             width: PLOT_W,
             height: PLOT_H,

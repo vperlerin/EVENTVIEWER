@@ -36,6 +36,7 @@
       // GEO
       var RIVER_COLOR = "#c8eaff";
       var LAND_COLOR = "#d4ffae";
+      var SUB_UNIT_BORDER = "#ccc";
  
 
       var XY_SERIES_MAX = 3;
@@ -82,28 +83,37 @@
          var all_params = urlParams(); 
          if(typeof all_params['j'] !== 'undefined' && typeof all_params['t'] !== 'undefined') {
             parseJsonPlot(all_params['j'],all_params['t']);
+         } else if(typeof all_params['j'] !== 'undefined'){
+           // We create all the plots at once
+           parseJsonPlot(all_params['j'],'all');
          } else {
-            // WE DRAW ALL PLOTS????
-            // FOR NOW... NO
             print_error('t parameter (plot type) is missing in URL')
          }
       }
 
+      
+ 
       // PARSE JSON
       function parseJsonPlot(json_file,plot_ids) {
 
-         // Plot type can be either a list of plot types
-         // ex: t=xy%2Ctest
-         // or a single value
-         // ex: t=xy
-         var r_plot_id = plot_ids.split(",");
-  
+        var r_plot_id = plot_ids.split(",");
+        
          $.ajax({
             url :json_file, 
             dataType : 'json',
             success : function(json_code, status){ // success est toujours en place, bien sûr !
                var f = false;
-               if(typeof json_code['plots'] !== "undefined") {
+
+
+               if(typeof json_code['plots'] !== "undefined") { 
+
+
+                  if(plot_ids == 'all') {
+                     r_plot_id = []
+                     $.each(json_code['plots'], function(i,v) { 
+                        r_plot_id.push(v.plot_id);
+                     });
+                  }
                   
                   // We search the proper plots
                   $.each(json_code['plots'], function(i,v) { 
@@ -113,6 +123,8 @@
                         f= true;
                      }
                   })
+                
+                
 
                   // Setup UI
                   hide_legend_on_hover();
@@ -236,6 +248,9 @@
             showlakes: false,
             showrivers: false,  
             showcountries: true,  
+            showsubunits: true,
+            subunitwidth:1,
+            subunitcolor:SUB_UNIT_BORDER,
             landcolor: LAND_COLOR,  
             countrywidth: 1.5, 
             coastlinewidth: .5,
@@ -401,8 +416,7 @@
          lons.push(tlon)  
          traces.push(trace) 
       }
- 
- 
+  
    
       // MAKE LINES FROM DATA 
       $.each( data['lines'], function(i,line) {
@@ -434,6 +448,12 @@
       layout = set_generic_layout_options(layout);
       layout = set_2Dmap_layout(layout,avg_lat,avg_lon);
 
+      // Add the map scope if any
+      if(typeof data['scope'] !== 'undefined') {
+         layout.geo.scope = data['scope'];
+      }
+      
+
       // Set Title
       layout.title.text = (typeof data['plot_name'] !== "undefined")?data['plot_name'] :""
       
@@ -448,7 +468,7 @@
       switch(plot_id) {
          case "iorbit":
             // Orbit Viewer
-            window.location = data['plot_url'];
+            //window.location = data['plot_url'];
             break;
          case "3D_traj":
             draw_plot_map_3D(data);

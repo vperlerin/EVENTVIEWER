@@ -319,7 +319,7 @@
             // The values
             field_x           = "x" + i + "_vals";
             field_y           = "y" + i + "_vals";
-            field_line        = "x" + i + "_line";
+            field_line_on     = "x" + i + "_line";
             data_label        = "x" + i + "_data_label";
             data_marker       = "x" + i + "_symbol;"
             data_marker_size  = "x" + i + "_symbol_size";
@@ -368,7 +368,7 @@
                name: typeof data['tx1_data_label']!== "undefined"?data['tx1_data_label']:'',
                type: 'line',
                line: {
-                  width: 5,
+                  width: 1,
                   color: typeof data['tx1_line_color']!== "undefined"?data['tx1_line_color']:DEFAULT_LINE_COLOR
                }
             }

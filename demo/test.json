@@ -37,7 +37,7 @@
            ]
        },
        {
-         "plot_id": "ground_track",
+         "plot_id": "ground_track_2",
          "plot_name": "Ground Track No Scope", 
          "plot_type": "map",
          "x_label": "Latitude",
@@ -3276,8 +3276,7 @@
                2.861794565535366,
                2.901794565535366
            ],
-           "plot_type": "xy_scatter",
-           "x1_symbol_size": "4",
+           "plot_type": "xy_scatter", 
            "x1_line_on": 1,
            "x1_data_label": "AMS1-010005",
            "x2_vals": [
@@ -3485,8 +3484,7 @@
                3.92,
                3.96,
                4.0
-           ],
-           "x2_symbol_size": "4",
+           ], 
            "x2_line_on": 1,
            "x2_data_label": "AMS9-010050",
            "tx1_vals": [

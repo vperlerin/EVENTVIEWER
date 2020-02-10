@@ -9,6 +9,7 @@
    </head>
    <body style="margin:0; padding:0;">
    <script src="./dist/js/allsky_eventviewer.min.js"></script>
+   <script src="./src/js/deepmerge/merge.js"></script>
    <script>
 
       /************ GRAPHICS STYLES ********************/
@@ -24,22 +25,14 @@
       var PAPER_BG_COLOR = 'rgba(9,29,63,1)';
       var PLOT_BG_COLOR = PAPER_BG_COLOR;
       var TRENDLINE_COLOR = 'rgba(213,42,224,.5)';
+
+      var DEFAULT_RAINBOW_COLOR = '#ff0000';
  
       /*******************************/
       var graph_counter = 0;
 
 
-      /*********** UI ***************************/
 
-
-      // Hide legend on hover (if data is behind)
-      function hide_legend_on_hover() {
-         $('.main-svg').hover(function() {
-            $('.legend').fadeOut();
-         }).mouseout(function() {
-            $('.legend').fadeIn();
-         });
-      }
 
  
       /*********** PARSE URL ***************************/
@@ -142,13 +135,13 @@
       }
       
 
-      // Add rainbdow colors to array
+      // Add rainbow colors to array
       function  get_rainbow_colors(total,rainbowcolors) {
          var all_colors = [];
          if(total>=255) {   
             // Default color for the end...
             for (var i = 255; i <= total; i = i + step) {
-               all_colors[i] = '#0000ff';
+               all_colors[i] = DEFAULT_RAINBOW_COLOR; // Default Rainbow color
             }
             for (var i = 0; i <= 255; i = i + step) {
                all_colors[i] = '#'+rainbowcolors.colourAt(i);
@@ -165,51 +158,39 @@
 
 
 
-      // Default Drawing function
-      function draw_plot_xy(data) {
+      // Set Generic Layout Options for the graph
+      function set_generic_options(layout) {
+         layout.title =    { 
+                  font: {  color: FONT_COLOR },
+                  xref: 'x',   
+                  yref: 'y',  
+                  x: 0.05, 
+         } ;
+         layout.height = PLOT_H;
+         layout.width =  PLOT_W;
+         layout.paper_bgcolor =  PAPER_BG_COLOR;   
+         layout.plot_bgcolor = PLOT_BG_COLOR; 
 
-         // Markers
-         var trace1 =  {
-               type: 'scatter',
-               marker : { symbol: 'square-open-dot', size:10 },
-               xaxis: "x1",
-               yaxis: "y1",
-               mode: 'markers'
+         layout.xaxis =  { 
+            zerolinecolor: H_LINE_COLOR, 
+            zerolinewidth: 1,
+            gridcolor: GRID_COLOR, 
+            linecolor: H_LINE_COLOR,  
+            title: { font: { size: 15, color: AXIS_FONT_COLOR } },
+            tickfont: { color: TICK_FONT_COLOR},
          };
-         
-         var layout = {
-            title: { 
-               font: {  color: FONT_COLOR },
-               xref: 'x',   
-               yref: 'y',  
-               x: 0.05, 
-            },
-            height: PLOT_H,
-            width: PLOT_W,
-            paper_bgcolor: PAPER_BG_COLOR,   
-            plot_bgcolor: PLOT_BG_COLOR,    
-            xaxis:{ 
-                  zerolinecolor: H_LINE_COLOR, 
-                  zerolinewidth: 1,
-                  gridcolor: GRID_COLOR, 
-                  linecolor: H_LINE_COLOR,  
-                  title: { font: { size: 15, color: AXIS_FONT_COLOR } },
-                  tickfont: { color: TICK_FONT_COLOR},
-                  side:'top'
-            },
-            yaxis:{
-                  zerolinecolor: V_LINE_COLOR, 
-                  zerolinewidth: 1, 
-                  gridcolor: GRID_COLOR, 
-                  linecolor: V_LINE_COLOR,
-                  title: { font: {  size: 15, color:  AXIS_FONT_COLOR}}, 
-                  tickfont: { color: TICK_FONT_COLOR},
-                  scaleanchor: "x",
-                  scaleratio: 1,
-                  autorange: "reversed" 
-            },
-            showlegend: true,
-            legend: {
+
+         layout.yaxis =  {
+            zerolinecolor: V_LINE_COLOR, 
+            zerolinewidth: 1, 
+            gridcolor: GRID_COLOR, 
+            linecolor: V_LINE_COLOR,
+            title: { font: {  size: 15, color:  AXIS_FONT_COLOR}}, 
+            tickfont: { color: TICK_FONT_COLOR},
+         };
+
+         layout.showlegend = true;
+         layout.legend = {
                x: 1,
                xanchor: 'right',
                y: 0,
@@ -220,24 +201,42 @@
                font: {
                   color: LEGEND_FONT_COLOR
                } 
-            }
-         }; 
+         };
 
-         var graph_name = 'graph'+graph_counter;
-         graph_counter+=1;
+         return layout
+      }
+      
+  
 
+      // Default Drawing function
+      function draw_plot_xy(data) {
+
+         // Markers
+         var trace1 =  {
+               type: 'scatter',  marker : { symbol: 'square-open-dot', size:10 }, xaxis: "x1",  yaxis: "y1",
+               mode: 'markers'
+         };
+         
+         // Build Layout
+         var layout = {};
+         layout = set_generic_options(layout);
+          
+         // CUSTOM STUFF FOR XY PLOT
+         layout.xaxis.side = 'top';
+         layout.yaxis.scaleanchor = "x";
+         layout.yaxis.scaleratio = 1;
+         layout.yaxis.autorange = "reversed"; 
+   
          trace1.x = data.x1_vals;
          trace1.y = data.y1_vals; 
 
          // Add labels
          if(typeof data.x_label !== "undefined") {
-            layout.xaxis.title.text = data.x_label;
-            layout.xaxis.title.font.color = AXIS_FONT_COLOR ;
+            layout.xaxis.title.text = data.x_label; 
          }
 
          if(typeof data.y_label !== "undefined") {
-            layout.yaxis.title.text = data.y_label;
-            layout.yaxis.title.font.color = AXIS_FONT_COLOR ;
+            layout.yaxis.title.text = data.y_label; 
          }
 
 
@@ -254,10 +253,24 @@
 
          // We add the color scale  or X
          trace1.marker.color  =  all_colors;  
-
-
+ 
          // Add the div
+         var graph_name = 'graph'+graph_counter;
+         graph_counter+=1;
          $('<div id="'+graph_name+'"></div>').appendTo($('body'));
+           
+
+         // Custom Options defined in the JSON
+         if(typeof data.opts != "undefined") {
+            Object.keys(data.opts).forEach(function(key) {
+               if(key=="layout") { 
+                  layout = deepmerge(layout,data.opts[key])
+               }
+                   
+            });
+            console.log(layout);
+         }
+         
 
          Plotly.newPlot(graph_name, [trace1], layout, {responsive: true});
          

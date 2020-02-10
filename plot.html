@@ -400,11 +400,14 @@
 
             traces[3] = {
                mode : 'markers',
-               marker: { size:0},
+               marker: { size:0.1, line: {width:0} },
                yaxis: 'y2',
-               y: data['y1_axis2_vals']
-            }
- 
+               y: data['y1_axis2_vals'],
+               showlegend: false
+            };
+  
+
+            
          }
              
          Plotly.newPlot( set_new_graph_container(), traces,layout);

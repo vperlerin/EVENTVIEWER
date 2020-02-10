@@ -119,7 +119,7 @@
                   $.each(json_code['plots'], function(i,v) { 
                      if(r_plot_id.indexOf(v['plot_id']) > -1)  {
                         // We Draw the corresponding plot 
-                        draw_plot(v,r_plot_id[r_plot_id.indexOf(v['plot_id'])],r_plot_id.indexOf(v['plot_id']));
+                        draw_plot(v,r_plot_id.indexOf(v['plot_id']));
                         f= true;
                      }
                   })
@@ -399,7 +399,7 @@
                layout.yaxis2.autorange = "reversed" 
             }
 
-            traces[0].xaxis = 'x'
+             traces[0].xaxis = 'x'
             traces[0].yaxis = 'y'; 
             traces[1].yaxis = 'y2'; 
             
@@ -496,17 +496,19 @@
 
       
    // Main function to draw all plots
-   function draw_plot(data,plot_id, order) {
+   function draw_plot(data, order) {
+
+      var plot_type = typeof data['plot_type'] !== 'undefined'?data['plot_type'] :'xy_scatter';
 
       switch(plot_id) {
-         case "iorbit":
+         case "iframe":
             // Orbit Viewer
             //window.location = data['plot_url'];
             break;
-         case "3D_traj":
+         case "3Dmap":
             draw_plot_map_3D(data);
             break;
-         case "ground_track":
+         case "map":
             draw_plot_map(data);
             break;
          default:

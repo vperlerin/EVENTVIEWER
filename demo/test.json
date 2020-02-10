@@ -3691,7 +3691,9 @@
                3.95959595959596,
                4.0
            ],
-           "tx1_data_label": "Fit"
+           "tx1_data_label": "Fit",
+           "y1_axis2_title":  "Height",
+           "plot_y_axis2_reverse": 1 
        },
        {
            "plot_id": "velocity",

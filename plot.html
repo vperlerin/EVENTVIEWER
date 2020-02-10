@@ -358,6 +358,9 @@
                ti++;
             }
          } 
+
+
+        
  
          // make the trend line if tx1_vals exist
          if(typeof data['tx1_vals'] !== 'undefined' && typeof ["ty1_vals"] !== 'undefined') {
@@ -372,6 +375,36 @@
                   color: typeof data['tx1_line_color']!== "undefined"?data['tx1_line_color']:DEFAULT_LINE_COLOR
                }
             }
+         }
+
+          // Do we have extra Axis?
+          if(typeof data['y1_axis2_title'] !== 'undefined') {
+            
+            // Update the Layout  
+             
+            
+            
+            layout.yaxis2 = {title:{font: {  size: 15, color:  AXIS_FONT_COLOR}}}
+            layout.yaxis2.title.text = (typeof data['y1_axis2_title'] !== 'undefined'?data['y1_axis2_title']:'');
+            layout.yaxis2.overlaying = 'y';
+            layout.yaxis2.side = 'right'; 
+            layout.yaxis2.showgrid = false; 
+            layout.yaxis2.zerolinecolor = V_LINE_COLOR;  
+            layout.yaxis2.zerolinewidth = 1;  
+            layout.yaxis2.gridcolor= GRID_COLOR;  
+            layout.yaxis2.linecolor= V_LINE_COLOR; 
+            layout.yaxis2.tickfont = { color: TICK_FONT_COLOR};
+           
+            if(typeof data['plot_y_axis2_reverse'] !== "undefined") {
+               layout.yaxis2.autorange = "reversed" 
+            }
+
+            traces[0].xaxis = 'x'
+            traces[0].yaxis = 'y'; 
+            traces[1].yaxis = 'y2'; 
+            
+                      
+  
          }
              
          Plotly.newPlot( set_new_graph_container(), traces,layout);

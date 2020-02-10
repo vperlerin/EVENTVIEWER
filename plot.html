@@ -49,9 +49,9 @@
       // Hide legend on hover (if data is behind)
       function hide_legend_on_hover() {
          $('.svg-container').hover(function() {
-            $(this).find('.legend').fadeOut();
+            $(this).find('.legend').hide();
          }).mouseout(function() {
-            $(this).find('.legend').fadeIn();
+            $(this).find('.legend').show();
          });
       }
 

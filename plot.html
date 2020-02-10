@@ -381,9 +381,6 @@
           if(typeof data['y1_axis2_title'] !== 'undefined') {
             
             // Update the Layout  
-             
-            
-            
             layout.yaxis2 = {title:{font: {  size: 15, color:  AXIS_FONT_COLOR}}}
             layout.yaxis2.title.text = (typeof data['y1_axis2_title'] !== 'undefined'?data['y1_axis2_title']:'');
             layout.yaxis2.overlaying = 'y';
@@ -397,14 +394,17 @@
            
             if(typeof data['plot_y_axis2_reverse'] !== "undefined") {
                layout.yaxis2.autorange = "reversed" 
-            }
-
-             traces[0].xaxis = 'x'
+            } 
+            traces[0].xaxis = 'x'
             traces[0].yaxis = 'y'; 
-            traces[1].yaxis = 'y2'; 
-            
-                      
-  
+
+            traces[3] = {
+               mode : 'markers',
+               marker: { size:0},
+               yaxis: 'y2',
+               y: data['y1_axis2_vals']
+            }
+ 
          }
              
          Plotly.newPlot( set_new_graph_container(), traces,layout);
@@ -500,7 +500,7 @@
 
       var plot_type = typeof data['plot_type'] !== 'undefined'?data['plot_type'] :'xy_scatter';
 
-      switch(plot_id) {
+      switch(plot_type) {
          case "iframe":
             // Orbit Viewer
             //window.location = data['plot_url'];
@@ -522,7 +522,7 @@
    });
 
     
-
+   
    function draw_plot_map_3D(data) {
       colors = ['orange', 'blue', 'green', 'purple', 'pink', 'white']
       traces = []
@@ -659,7 +659,7 @@
             }
          };
 
-      Plotly.newPlot('mydiv', traces,layout);
+      Plotly.newPlot(set_new_graph_container(), traces,layout);
 
    }
  

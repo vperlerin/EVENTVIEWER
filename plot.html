@@ -20,11 +20,18 @@
       var V_LINE_COLOR = 'rgba(255,255,255,1)';
       var FONT_COLOR = '#ffffff';
       var AXIS_FONT_COLOR = '#b1b1b1';
-      var LEGEND_FONT_COLOR = FONT_COLOR;
+   
+
       var PAPER_BG_COLOR = 'rgba(9,29,63,1)';
       var PLOT_BG_COLOR = PAPER_BG_COLOR;
       var TRENDLINE_COLOR = 'rgba(213,42,224,.5)';
       var DEFAULT_LINE_COLOR = 'rgba(213,42,224,.5)';
+
+      // LEGEND
+         
+      var LEGEND_FONT_COLOR = FONT_COLOR;
+      var LEGEND_BORDER = 'rgba(255,255,255,.03)';
+      var LEGEND_BG = 'rgba(255,255,255,.01)';
 
       // GEO
       var RIVER_COLOR = "#c8eaff";
@@ -40,7 +47,7 @@
       /*********** UI ***************************/
       // Hide legend on hover (if data is behind)
       function hide_legend_on_hover() {
-         $('.main-svg').hover(function() {
+         $('.js-plotly-plot').hover(function() {
             $(this).find('.legend').fadeOut();
          }).mouseout(function() {
             $(this).find('.legend').fadeIn();
@@ -210,9 +217,9 @@
                x:1,
                orientation: 'v',
                traceorder: 'normal',
-               bordercolor: 'rgba(255,255,255,.3)',
+               bordercolor: LEGEND_BORDER,  
                borderwidth: 1,
-               bgcolor: 'rgba(255,255,255,.1)',
+               bgcolor:  LEGEND_BG,
                font: {
                   color: LEGEND_FONT_COLOR
                } 

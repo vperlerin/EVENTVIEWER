@@ -30,7 +30,7 @@
       var D_V_LINE_COLOR = '#fff';  
       var D_GRID_COLOR = '#464545';
      
-     // LEGEND
+      // LEGEND
       var LEGEND_FONT_COLOR = FONT_COLOR;
       var LEGEND_BORDER = 'rgba(255,255,255,.0)';
       var LEGEND_BG = 'rgba(255,255,255,.01)';
@@ -39,6 +39,9 @@
       var RIVER_COLOR = "#c8eaff";
       var LAND_COLOR = "#d4ffae";
       var SUB_UNIT_BORDER = "#ccc";
+
+      // METEOR POSITION
+      var DEFAULT_METEOR_SYMBOL = "square-open-dot";
 
       // ALL MARKERS (ONE FOR EACH STATION)
       // see https://plot.ly/javascript/reference/#scatter-marker
@@ -284,7 +287,7 @@ function set_2Dmap_layout(layout,avg_lat,avg_lon) {
          range: [avg_lon-5, avg_lon+5],
          dtick: 5 
       }
-      }
+   }
    return layout
 }
       
@@ -373,142 +376,186 @@ function get_marker() {
    return ALL_MARKERS[MARKER_CNT]; 
 }
 
+// Create Rainbow colors for meteor pos
+function get_meteor_pos_color(total_pos) {
+   var rainbow = new Rainbow(), all_colors = [], step = 1;
+   rainbow.setNumberRange(0, 255);
+   if(total_pos>=255) {   
+      // Default color for the end...
+      for (var i = 255; i <= total_pos; i = i + step) {
+         all_colors[i] = '#0000ff';
+      }
+      for (var i = 0; i <= 255; i = i + step) {
+         all_colors[i] = '#'+rainbow.colourAt(i);
+      }
+   } else {
+      step = parseInt(255/total_pos);  
+
+      for (var i = 0; i <= 255; i = i + step) {
+         all_colors.push('rgba('+hexToRgb(rainbow.colourAt(i))+')');
+      }
+   }
+   return all_colors;
+}
+
 // Draw default x,y plot
 function draw_plot_xy(data) {
 
-         // Create Default Layout
-         var layout = {};
-         layout = set_generic_layout_options(layout);
-          
-         // Speficics for xy
+      // Create Default Layout
+      var layout = {}, all_colors, meteor_pos=false;
+      layout = set_generic_layout_options(layout);
+         
+      // Specifics for xy
+      if(typeof data['opts'] == 'undefined') {
          layout.title.x = 0.05;
          layout.xaxis.side = 'bottom';
+      } else if(data['opts'] == 'meteor_pos' ) {
          
-         // Plot Name
-         layout.title.text =  typeof data.plot_name !== 'undefined'?data.plot_name:'';   
+         meteor_pos = true;
+         layout.xaxis.side = 'top';
+         layout.showlegend = false;
 
-         if(typeof data.plot_y_axis_reverse !== "undefined") {
-            if(data.plot_y_axis_reverse == 1) {
-                  layout.yaxis.autorange = "reversed" 
-            }
-         }   
-         // Add labels
-         if(typeof data.x_label !== "undefined") {
-            layout.xaxis.title.text = data.x_label; 
-         }
-         if(typeof data.y_label !== "undefined") {
-            layout.yaxis.title.text = data.y_label; 
-         }
-
-         // make traces data array for each data series
-         traces = [];
-         ti = 0;  // Trace Counter
-
-         for (var i = 1; i <= XY_SERIES_MAX; i++) {
-            
-            // The values
-            field_x           = "x" + i + "_vals";
-            field_y           = "y" + i + "_vals";
-            field_line_on     = "x" + i + "_line";
-            data_label        = "x" + i + "_data_label";
-            data_marker       = "x" + i + "_symbol;"
-            data_marker_size  = "x" + i + "_symbol_size";
-            data_marker_color = "x" + i + "_color";
- 
-            if(typeof data[field_x] !== 'undefined' && typeof data[field_y] !== 'undefined') {
-              
-               traces[ti] = {
-                  x: data[field_x],
-                  y: data[field_y],
-                  mode: 'markers',
-                  marker: {  symbol: (data[data_marker]?data[data_marker]:get_marker()), 
-                             size: (data[data_marker_size]?data[data_marker_size]:6), 
-                             type: 'scatter'
-                  },
-                  name: (data[data_label]?data[data_label]:'') 
-               };
-
-               // Colors
-               if(data[data_marker_color]) {
-                  traces[ti].marker.color = data[data_marker_color]; 
-               }
-
-               // Markers size
-               if(data[data_marker_size]) {
-                  traces[ti].marker.size = data[data_marker_size]; 
-               }
-
-               // Line
-               if(typeof data[field_line_on] !== 'undefined') {
-                  if(data[field_line_on] == "1") {
-                     traces[ti].mode="lines+markers";
-                  }
-               }
-
-               ti++;
-            }
-         } 
- 
- 
-         // make the trend line if tx1_vals exist
-         if(typeof data['tx1_vals'] !== 'undefined' && typeof ["ty1_vals"] !== 'undefined') {
-            traces[ti] = {
-               x: data["tx1_vals"],
-               y: data["ty1_vals"],
-               mode: 'lines',
-               name: typeof data['tx1_data_label']!== "undefined"?data['tx1_data_label']:'',
-               type: 'line',
-               line: {
-                  width: 1,
-                  color: typeof data['tx1_line_color']!== "undefined"?data['tx1_line_color']:DEFAULT_LINE_COLOR
-               }
-            }
-         }
-
-          // Do we have extra Axis?
-          if(typeof data['y1_axis2_title'] !== 'undefined') {
-            
-            // Update the Layout  
-            layout.yaxis2 = {title:{font: {  size: 15, color:  AXIS_FONT_COLOR}}}
-            layout.yaxis2.title.text = (typeof data['y1_axis2_title'] !== 'undefined'?data['y1_axis2_title']:'');
-            layout.yaxis2.overlaying = 'y';
-            layout.yaxis2.side = 'right'; 
-            layout.yaxis2.showgrid = false; 
-            layout.yaxis2.zerolinecolor = V_LINE_COLOR;  
-            layout.yaxis2.zerolinewidth = 1;  
-            layout.yaxis2.gridcolor= GRID_COLOR;  
-            layout.yaxis2.linecolor= V_LINE_COLOR; 
-            layout.yaxis2.tickfont = { color: TICK_FONT_COLOR};
-           
-            if(typeof data['plot_y_axis2_reverse'] !== "undefined") {
-               layout.yaxis2.autorange = "reversed" 
-            } 
-            traces[0].xaxis = 'x'
-            traces[0].yaxis = 'y'; 
-
-            traces[3] = {
-               mode : 'markers',
-               marker: { size:0.1, line: {width:0} },
-               yaxis: 'y2',
-               y: data['y1_axis2_vals'],
-               showlegend: false
-            }; 
-         }
-             
-         Plotly.newPlot( set_new_graph_container(), traces,layout);
-     
+         // RAINBOW Color for meteor_pos!
+         all_colors = get_rainbow_colors(data['x1_vals'].length+1,create_rainbow_colors());
+         all_colors.reverse();
       }
+
+      // Plot Name
+      layout.title.text =  typeof data.plot_name !== 'undefined'?data.plot_name:'';   
+
+      if(typeof data.plot_y_axis_reverse !== "undefined") {
+         if(data.plot_y_axis_reverse == 1) {
+               layout.yaxis.autorange = "reversed" 
+         }
+      }   
+      // Add labels
+      if(typeof data.x_label !== "undefined") {
+         layout.xaxis.title.text = data.x_label; 
+      }
+      if(typeof data.y_label !== "undefined") {
+         layout.yaxis.title.text = data.y_label; 
+      }
+
+      // make traces data array for each data series
+      traces = [];
+      ti = 0;  // Trace Counter
+
+      for (var i = 1; i <= XY_SERIES_MAX; i++) {
+         
+         // The values
+         field_x           = "x" + i + "_vals";
+         field_y           = "y" + i + "_vals";
+         field_line_on     = "x" + i + "_line";
+         data_label        = "x" + i + "_data_label";
+         data_marker       = "x" + i + "_symbol;"
+         data_marker_size  = "x" + i + "_symbol_size";
+         data_marker_color = "x" + i + "_color";
+         x_reverse         = "x" + i + "_reverse";
+         y_reverse         = "y" + i + "_reverse";
+
+         if(typeof data[field_x] !== 'undefined' && typeof data[field_y] !== 'undefined') {
+            
+            traces[ti] = {
+               x: data[field_x],
+               y: data[field_y],
+               mode: 'markers',
+               marker: {   symbol: (data[data_marker]?data[data_marker]:get_marker()), 
+                           size: (data[data_marker_size]?data[data_marker_size]:6), 
+                           type: 'scatter'
+               },
+               name: (data[data_label]?data[data_label]:'') 
+            }; 
+
+            // Meteor Pos => Square & Rainbow colors
+            if(meteor_pos) {
+               traces[ti].marker.symbol = DEFAULT_METEOR_SYMBOL;
+               traces[ti].marker.size = 10;
+               traces[ti].marker.color  =  all_colors;  
+            }
+ 
+            // Reverse
+            if(data[x_reverse]) {
+               layout.xaxis.autorange = "reversed";
+            }
+            if(data[y_reverse]) {
+               layout.yaxis.autorange = "reversed";
+            }
+
+            // Colors
+            if(data[data_marker_color]) {
+               traces[ti].marker.color = data[data_marker_color]; 
+            }
+
+            // Markers size
+            if(data[data_marker_size]) {
+               traces[ti].marker.size = data[data_marker_size]; 
+            }
+
+            // Line
+            if(typeof data[field_line_on] !== 'undefined') {
+               if(data[field_line_on] == "1") {
+                  traces[ti].mode="lines+markers";
+               }
+            }
+
+            ti++;
+         }
+      } 
+
+
+      // make the trend line if tx1_vals exist
+      if(typeof data['tx1_vals'] !== 'undefined' && typeof ["ty1_vals"] !== 'undefined') {
+         traces[ti] = {
+            x: data["tx1_vals"],
+            y: data["ty1_vals"],
+            mode: 'lines',
+            name: typeof data['tx1_data_label']!== "undefined"?data['tx1_data_label']:'',
+            type: 'line',
+            line: {
+               width: 1,
+               color: typeof data['tx1_line_color']!== "undefined"?data['tx1_line_color']:DEFAULT_LINE_COLOR
+            }
+         }
+      }
+
+         // Do we have extra Axis?
+         if(typeof data['y1_axis2_title'] !== 'undefined') {
+         
+         // Update the Layout  
+         layout.yaxis2 = {title:{font: {  size: 15, color:  AXIS_FONT_COLOR}}}
+         layout.yaxis2.title.text = (typeof data['y1_axis2_title'] !== 'undefined'?data['y1_axis2_title']:'');
+         layout.yaxis2.overlaying = 'y';
+         layout.yaxis2.side = 'right'; 
+         layout.yaxis2.showgrid = false; 
+         layout.yaxis2.zerolinecolor = V_LINE_COLOR;  
+         layout.yaxis2.zerolinewidth = 1;  
+         layout.yaxis2.gridcolor= GRID_COLOR;  
+         layout.yaxis2.linecolor= V_LINE_COLOR; 
+         layout.yaxis2.tickfont = { color: TICK_FONT_COLOR};
+         
+         if(typeof data['plot_y_axis2_reverse'] !== "undefined") {
+            layout.yaxis2.autorange = "reversed" 
+         } 
+         traces[0].xaxis = 'x'
+         traces[0].yaxis = 'y'; 
+
+         traces[3] = {
+            mode : 'markers',
+            marker: { size:0.1, line: {width:0} },
+            yaxis: 'y2',
+            y: data['y1_axis2_vals'],
+            showlegend: false
+         }; 
+      }
+            
+      Plotly.newPlot( set_new_graph_container(), traces,layout);
+     
+}
  
 // Draw 2D plot map
 function draw_plot_map(data) {
-      // Station colors
-      //var colors = get_rainbow_colors(data['points'].length+1,create_rainbow_colors())
-       
-      map_data = []
-      lats = []
-      lons = []
-      names= []
-      traces = [] 
+      
+      var map_data = [], lats = [], lons = [], names= [], traces = [];
       // MAKE POINTS FROM DATA 
       for (var i = 0; i < data['points'].length; i++) {
  

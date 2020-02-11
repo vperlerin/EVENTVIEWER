@@ -40,7 +40,8 @@ function js() {
     .src([
       './src/js/plugins/jquery-3.4.1.min.js',
       './src/js/plugins/rainbowvis.js',
-      './src/js/plugins/plotly.min.js'
+      './src/js/plugins/plotly.min.js',
+      './src/js/eventviewer.js'
     ])
     .pipe(concat('allsky_eventviewer.min.js').on('error', function(e){
         console.log('CONCAT ' + e);

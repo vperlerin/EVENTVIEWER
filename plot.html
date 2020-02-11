@@ -446,9 +446,6 @@ function draw_plot_xy(data) {
       if(typeof data.y_axis_position !== "undefined") {
          layout.yaxis.side = data.y_axis_position;
       }
-      
-
-     
  
 
 
@@ -468,7 +465,11 @@ function draw_plot_xy(data) {
          data_marker_color = "x" + i + "_color";
          x_reverse         = "x" + i + "_reverse";
          y_reverse         = "y" + i + "_reverse";
-
+         y_scale_anchor    = "y" + i + "_axis_scaleanchor"; 
+         x_scale_anchor    = "x" + i + "_axis_scaleanchor"; 
+         y_scale_scaleratio    = "y" + i + "_axis_scaleratio"; 
+         x_scale_scaleratio    = "x" + i + "_axis_scaleratio"; 
+        
          if(typeof data[field_x] !== 'undefined' && typeof data[field_y] !== 'undefined') {
             
             traces[ti] = {
@@ -518,6 +519,17 @@ function draw_plot_xy(data) {
                }
             }
 
+            // Scales (only for Y for now)
+            if(typeof data[y_scale_anchor] !== 'undefined') {
+               layout.yaxis.scaleanchor =  data[y_scale_anchor] ;
+            }
+            if(typeof data[y_scale_scaleratio] !== 'undefined') {
+               layout.yaxis.scaleratio =  data[y_scale_scaleratio] ;
+
+               traces[0].xaxis = "x";
+               traces[0].yaxis = "y"; 
+               
+            } 
             ti++;
          }
       } 
@@ -567,8 +579,6 @@ function draw_plot_xy(data) {
          if(typeof data['plot_y_axis2_reverse'] !== "undefined") {
             layout.yaxis2.autorange = "reversed" 
          } 
-         traces[0].xaxis = 'x'
-         traces[0].yaxis = 'y'; 
 
          traces[3] = {
             mode : 'markers',
@@ -578,7 +588,7 @@ function draw_plot_xy(data) {
             showlegend: false
          }; 
       }
-            
+       
       Plotly.newPlot( set_new_graph_container(), traces,layout);
      
 }

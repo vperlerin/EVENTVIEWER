@@ -225,7 +225,9 @@
          1453,
          1440
          ], 
-         "x1_reverse": 1
+         "y1_reverse": 1, 
+         "y1_axis_scaleanchor": "x",
+         "y1_axis_scaleratio": 1
       },
        {
            "plot_id": "iorbit",

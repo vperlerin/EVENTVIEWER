@@ -1,15 +1,11 @@
 {
    "plots": [
       {  
-         "plot_id": "Llight_curve",
+         "plot_id": "Light_curve",
          "plot_type": "xy_scatter",
-         "plot_name": "Light Curve",
-         "opts": "meteor_pos",
-         "x_label": "X",
-         "y_label": "Y",
-         "title": "Light Intensity",
-         "linetype1": "lines+markers",
-         "lineshape1": "spline",
+         "plot_name": "Light Intensity",
+         "opts": "meteor_pos", 
+         "linetype1": "lines+markers", 
          "y1_vals": [
              3391,
              3524,
@@ -113,7 +109,8 @@
              "13:13.520",
              "13:13.560",
              "13:13.640"
-         ] 
+         ],
+         "x1_data_label": "Meteor Position"
      },
       {
          "plot_id": "Position",
@@ -122,6 +119,8 @@
          "opts": "meteor_pos",
          "x_label": "X",
          "y_label": "Y",
+         "showlegend": false,
+         "x_axis_position": "top",
          "y1_vals": [
             358,
             359,

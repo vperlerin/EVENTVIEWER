@@ -402,7 +402,7 @@ function get_meteor_pos_color(total_pos) {
 function draw_plot_xy(data) {
 
       // Create Default Layout
-      var layout = {}, all_colors, meteor_pos=false;
+      var layout = {}, all_colors=null, meteor_pos=false;
       layout = set_generic_layout_options(layout);
          
       // Specifics for xy
@@ -412,12 +412,10 @@ function draw_plot_xy(data) {
       } else if(data['opts'] == 'meteor_pos' ) {
          
          meteor_pos = true;
-         layout.xaxis.side = 'top';
-         layout.showlegend = false;
 
          // RAINBOW Color for meteor_pos!
          all_colors = get_rainbow_colors(data['x1_vals'].length+1,create_rainbow_colors());
-         all_colors.reverse();
+       
       }
 
       // Plot Name
@@ -435,6 +433,24 @@ function draw_plot_xy(data) {
       if(typeof data.y_label !== "undefined") {
          layout.yaxis.title.text = data.y_label; 
       }
+      
+      // Show Legend
+      if(typeof data.showlegend !== "undefined") {
+         layout.showlegend = data.showlegend;
+      }
+       
+      // X, Y axis position
+      if(typeof data.x_axis_position !== "undefined") {
+         layout.xaxis.side = data.x_axis_position;
+      }
+      if(typeof data.y_axis_position !== "undefined") {
+         layout.yaxis.side = data.y_axis_position;
+      }
+      
+
+     
+ 
+
 
       // make traces data array for each data series
       traces = [];
@@ -476,6 +492,10 @@ function draw_plot_xy(data) {
             // Reverse
             if(data[x_reverse]) {
                layout.xaxis.autorange = "reversed";
+
+               if(all_colors!== null) {
+                  all_colors.reverse();
+               }
             }
             if(data[y_reverse]) {
                layout.yaxis.autorange = "reversed";
@@ -501,6 +521,17 @@ function draw_plot_xy(data) {
             ti++;
          }
       } 
+
+
+      // Line on first serie
+      if(typeof data.linetype1 !== "undefined") {
+         if(data.linetype1 == "lines+markers") {
+            traces[0].mode = 'lines+markers'; 
+            traces[0].line = {};
+            traces[0].line.shape = 'spline';
+            traces[0].line.color = DEFAULT_LINE_COLOR;
+         }
+      }
 
 
       // make the trend line if tx1_vals exist

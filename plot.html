@@ -289,7 +289,7 @@ function set_2Dmap_layout(layout,avg_lat,avg_lon) {
 }
       
 // Set 3D Graph Layout
-function set_3Dmap_layout(layout, lat, lon, title, data) {
+function set_3Dmap_layout(layout, axis_details, title, data) {
    var layout = {
          title: {
             font: { color: FONT_COLOR },
@@ -301,24 +301,6 @@ function set_3Dmap_layout(layout, lat, lon, title, data) {
          height: PLOT_H,
          width: PLOT_W,
          paper_bgcolor: PAPER_BG_COLOR,
-         yaxis:{
-               range : [rlon1, rlon2],
-               zerolinecolor: V_LINE_COLOR,
-               zerolinewidth: 1,
-               gridcolor: GRID_COLOR,
-               linecolor: V_LINE_COLOR,
-               title: { font: {  size: 15, color:  AXIS_FONT_COLOR}},
-               tickfont: { color: TICK_FONT_COLOR},
-               
-         },
-         zaxis:{ 
-               zerolinecolor: V_LINE_COLOR,
-               zerolinewidth: 1,
-               gridcolor: GRID_COLOR,
-               linecolor: V_LINE_COLOR,
-               title: { font: {  size: 15, color:  AXIS_FONT_COLOR}},
-               tickfont: { color: TICK_FONT_COLOR},
-         },
          showlegend: true,
          scene: {
             xaxis:{  
@@ -343,13 +325,16 @@ function set_3Dmap_layout(layout, lat, lon, title, data) {
                gridcolor: D_GRID_COLOR,
                linecolor: D_H_LINE_COLOR,
                title: { font: { size: 15, color: AXIS_FONT_COLOR }, text:(typeof data['z_label']!== 'undefined'?data['z_label']:'') },
-               tickfont: { color: TICK_FONT_COLOR} 
+               tickfont: { color: TICK_FONT_COLOR},
+            },
+            camera: {
+               eye: {x: -0.76, y: 1.8, z: 0.92}
             }
          },
          margin: {
             l: 0,
             r: 0,
-            t: 35,
+            t: 50,
             b: 50
          },
          legend: {
@@ -358,7 +343,18 @@ function set_3Dmap_layout(layout, lat, lon, title, data) {
                color: LEGEND_FONT_COLOR
             }
          }
-      };
+      }; 
+
+   // Set up the ranges
+   if(typeof axis_details['x_axis']!=='undefined') { 
+      layout.scene.xaxis.range =axis_details['x_axis'];
+   }
+   if(typeof axis_details['z_axis']!=='undefined') { 
+      layout.scene.zaxis.range =  axis_details['z_axis'];
+   }
+   if(typeof axis_details['y_axis']!=='undefined') { 
+      layout.scene.yaxis.range =  axis_details['y_axis'];
+   } 
    return layout;
 }
 
@@ -593,7 +589,7 @@ function draw_iframe(data) {
 // Draw 3D Map (meteor + stations)
 function draw_plot_map_3D(data) {
     
-   var traces = [], all_lats = [], all_lons = [], cc=0;
+   var traces = [], all_lats = [], all_lons = [], cc=0, axis_details={};
    
    // Get Station Points with proper marker
    for (var i = 0; i < data['points'].length; i++) {
@@ -653,19 +649,25 @@ function draw_plot_map_3D(data) {
       cc++;
    }
  
-   // get min/max range for x,y axis
-   max_lat = Math.max.apply(null,all_lats) 
-   min_lat = Math.min.apply(null,all_lats) 
-   max_lon = Math.max.apply(null,all_lons) 
-   min_lon = Math.min.apply(null,all_lons) 
+   // Get range for x,y axis
+   min_lat = Math.min.apply(null,all_lats);
+   max_lat = Math.max.apply(null,all_lats);
+   lat_diff = Math.abs(max_lat - min_lat)/2;
 
-   // No idea... comes from Mike
-   rlon1 = min_lon - 1
-   rlon2 = max_lon + 1
+   min_lng = Math.min.apply(null,all_lons);
+   max_lng = Math.max.apply(null,all_lons);
+   lng_diff = Math.abs(max_lng - min_lng)/2;
 
+
+   axis_details = {
+      y_axis: [min_lat-lat_diff, max_lat+lat_diff],
+      x_axis: [min_lng-lng_diff, max_lng+lng_diff],
+      z_axis: [0,100]  // From 0 to 100km by default for the altitude
+   }
+    
    // Create Default Layout
    var layout = {}; 
-   layout = set_3Dmap_layout(layout,max_lat,max_lon,(typeof(data['plot_name'])!=='undefined'?data['plot_name']:''),data);
+   layout = set_3Dmap_layout(layout,axis_details,(typeof(data['plot_name'])!=='undefined'?data['plot_name']:''),data);
    Plotly.newPlot(set_new_graph_container(), traces,layout);
 
 }

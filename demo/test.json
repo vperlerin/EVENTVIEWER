@@ -37,35 +37,6 @@
            ]
        },
        {
-         "plot_id": "ground_track",
-         "plot_name": "Ground Track No Scope", 
-         "plot_type": "map",
-         "x_label": "Latitude",
-         "y_label": "Longitude",
-         "points": [
-             [
-                 "39.589095",
-                 "-76.584252"
-             ],
-             [
-                 "38.952900",
-                 "-78.932016"
-             ]
-         ],
-         "point_names": [
-             "AMS1-010005",
-             "AMS9-010050"
-         ],
-         "lines": [
-             [
-                 39.05748430130978,
-                 -80.02665789457686,
-                 38.99798945840788,
-                 -80.66569494818481
-             ]
-         ]
-     },
-       {
            "plot_id": "3D_traj",
            "plot_name": "3D Trajectory",
            "plot_type": "3Dmap",
